@@ -514,7 +514,7 @@
 
 
 
-    var tags = ["p", "span", "header", "footer", "div", "a", "h1", "h2", "h3", "h4", "h5"]
+    var tags = ["p", "span", "header", "footer", "div", "a", "h1", "h2", "h3", "h4", "h5"];
     var elements = [];
 
     for (i = 0; i < tags.length; i += 1) {
@@ -535,14 +535,14 @@
         if (text === undefined) {
             continue;
         }
-        text.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "");
+        text = text.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/igm, "");
+        text = text.replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/igm, "");
         text = text.split(" ");
         text = text.map(function(word) {
             return word.trim().toLowerCase();
         });
-
         for (j = 0; j < text.length; j += 1) {
-            var word = text[i];
+            var word = text[j];
             if (word === undefined || word == "" || stopWordsSet.has(word)) {
                 continue;
             }
@@ -556,9 +556,6 @@
     }
 
     console.log(wordRanking);
-
-
-
 
 
 
