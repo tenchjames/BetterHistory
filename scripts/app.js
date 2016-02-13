@@ -11,7 +11,7 @@
     //
 
 
-    chrome.storage.sync.get("visitedPages", function(data){
+    chrome.storage.local.get("visitedPages", function(data){
         if (!chrome.runtime.error) {
             console.log(data.visitedPages);
         }
