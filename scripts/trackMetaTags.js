@@ -74,7 +74,7 @@
 
     var saveToLocalStorage = function() {
         chrome.storage.local.set({'historyData':historyData}, function () {
-            console.log("Just visited",historyData)
+            console.log("History data",historyData)
         });
     }
 
@@ -512,48 +512,30 @@
     );
     var stopWordsSet = new Set(stopWordsArray);
 
+    var bodyHtml = document.getElementsByTagName("body")[0].innerHTML;
+    bodyHtml = bodyHtml.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/igm, "");
+    bodyHtml = bodyHtml.replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/igm, "");
+    bodyHtml = bodyHtml.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/igm, "");
+    bodyHtml = bodyHtml.replace(/<.*?>/igm, " ");
+    var newBodyText = bodyHtml.textContent;
 
 
-    var tags = ["p", "span", "header", "footer", "div", "a", "h1", "h2", "h3", "h4", "h5"];
-    var elements = [];
-
-    for (i = 0; i < tags.length; i += 1) {
-        var currentTags = document.getElementsByTagName(tags[i]);
-        for (j = 0; j < currentTags.length; j+= 1) {
-            elements.push(currentTags[j]);
-        }
-    }
-
+    var words = newBodyText.split(" ").map(function(word) { return word.trim().toLocaleLowerCase();});
     var wordRanking = {};
 
-    var parseElementText = function(element) {
-        return element.textContent;
-    }
-
-    for (i = 0; i < elements.length; i += 1) {
-        var text = parseElementText(elements[i]);
-        if (text === undefined) {
+    for (i = 0; i < words.length; i += 1) {
+        var word = words[i];
+        if (word === undefined || word == "" || stopWordsSet.has(word)) {
             continue;
         }
-        text = text.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/igm, "");
-        text = text.replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/igm, "");
-        text = text.split(" ");
-        text = text.map(function(word) {
-            return word.trim().toLowerCase();
-        });
-        for (j = 0; j < text.length; j += 1) {
-            var word = text[j];
-            if (word === undefined || word == "" || stopWordsSet.has(word)) {
-                continue;
-            }
-            var wordCount = wordRanking[word];
-            if (wordCount === undefined) {
-                wordRanking[word] = 1
-            } else {
-                wordRanking[word] += 1;
-            }
+        var wordCount = wordRanking[word];
+        if (wordCount === undefined) {
+            wordRanking[word] = 1
+        } else {
+            wordRanking[word] += 1;
         }
     }
+
 
     console.log(wordRanking);
 
